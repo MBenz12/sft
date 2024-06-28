@@ -63,11 +63,15 @@ export const getCreateMetadataInstruction = async (
 export const getMintSftInstruction = async (
   program: Program<SftVault>,
   payer: PublicKey,
-  fragmentMint: PublicKey,
+  goldFragmentMint: PublicKey,
+  silverFragmentMint: PublicKey,
+  bronzeFragmentMint: PublicKey,
   amount: BN,
 ) => {
   const [vault] = getVaultPda();
-  const fragmentAta = getAssociatedTokenAddressSync(fragmentMint, payer);
+  const goldFragmentAta = getAssociatedTokenAddressSync(goldFragmentMint, payer);
+  const silverFragmentAta = getAssociatedTokenAddressSync(silverFragmentMint, payer);
+  const bronzeFragmentAta = getAssociatedTokenAddressSync(bronzeFragmentMint, payer);
   const payerSolAta = getAssociatedTokenAddressSync(NATIVE_MINT, payer);
   const vaultSolAta = getAssociatedTokenAddressSync(NATIVE_MINT, vault, true);
 
@@ -76,8 +80,12 @@ export const getMintSftInstruction = async (
     .accounts({
       payer,
       vault,
-      fragmentMint,
-      fragmentAta,
+      goldFragmentMint,
+      goldFragmentAta,
+      silverFragmentMint,
+      silverFragmentAta,
+      bronzeFragmentMint,
+      bronzeFragmentAta,
       nativeMint: NATIVE_MINT,
       payerSolAta,
       vaultSolAta,
@@ -117,8 +125,7 @@ export const getCombineInstruction = async (
 ) => {
   const [vault] = getVaultPda();
   const payerFragmentAta = getAssociatedTokenAddressSync(fragmentMint, payer);
-  const vaultFragmentAta = getAssociatedTokenAddressSync(fragmentMint, vault, true);
-  const pieceAta = getAssociatedTokenAddressSync(pieceMint, payer);
+  const payerPieceAta = getAssociatedTokenAddressSync(pieceMint, payer);
 
   return await program.methods
     .combine({ amount })
@@ -128,8 +135,32 @@ export const getCombineInstruction = async (
       fragmentMint,
       pieceMint,
       payerFragmentAta,
-      vaultFragmentAta,
-      pieceAta,
+      payerPieceAta,
+      tokenProgram: TOKEN_PROGRAM_ID,
+    })
+    .instruction();
+}
+
+export const getSplitInstruction = async (
+  program: Program<SftVault>,
+  payer: PublicKey,
+  fragmentMint: PublicKey,
+  pieceMint: PublicKey,
+  amount: BN,
+) => {
+  const [vault] = getVaultPda();
+  const payerFragmentAta = getAssociatedTokenAddressSync(fragmentMint, payer);
+  const payerPieceAta = getAssociatedTokenAddressSync(pieceMint, payer);
+
+  return await program.methods
+    .split({ amount })
+    .accounts({
+      payer,
+      vault,
+      fragmentMint,
+      pieceMint,
+      payerFragmentAta,
+      payerPieceAta,
       tokenProgram: TOKEN_PROGRAM_ID,
     })
     .instruction();

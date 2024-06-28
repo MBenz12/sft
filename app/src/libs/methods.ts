@@ -1,7 +1,7 @@
 import { BN, Program } from '@project-serum/anchor';
 import { WalletContextState } from '@solana/wallet-adapter-react';
 import { Keypair, PublicKey, SystemProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
-import { getClosePdaInstruction, getCombineInstruction, getCreateAtaInstruction, getCreateMetadataInstruction, getInitVaultInstruction, getMintSftInstruction, getWithdrawInstruction } from './instructions';
+import { getClosePdaInstruction, getCombineInstruction, getCreateAtaInstruction, getCreateMetadataInstruction, getInitVaultInstruction, getMintSftInstruction, getSplitInstruction, getWithdrawInstruction } from './instructions';
 import { SftVault } from 'idl/sft_vault';
 import { getVaultPda, sendAndConfirmTransaction, sendAndConfirmTransactions } from './utils';
 import { Sft, Vault } from 'types';
@@ -177,12 +177,16 @@ export async function mintSft(
 
     const [vault] = getVaultPda();
 
-    const index = Math.floor(Math.random() * 1000) % 3;
+    // const index = Math.floor(Math.random() * 1000) % 3;
 
-    const fragmentMint: PublicKey = vaultData.fragmentSfts[index].mint;
+    const goldFragmentMint: PublicKey = vaultData.fragmentSfts[0].mint;
+    const silverFragmentMint: PublicKey = vaultData.fragmentSfts[0].mint;
+    const bronzeFragmentMint: PublicKey = vaultData.fragmentSfts[0].mint;
 
     [
-      await getCreateAtaInstruction(connection, payer, fragmentMint, payer),
+      await getCreateAtaInstruction(connection, payer, goldFragmentMint, payer),
+      await getCreateAtaInstruction(connection, payer, silverFragmentMint, payer),
+      await getCreateAtaInstruction(connection, payer, bronzeFragmentMint, payer),
       await getCreateAtaInstruction(connection, payer, NATIVE_MINT, payer),
       await getCreateAtaInstruction(connection, payer, NATIVE_MINT, vault, true),
     ].forEach(ix => ix && transaction.add(ix));
@@ -199,7 +203,7 @@ export async function mintSft(
     );
 
     transaction.add(
-      await getMintSftInstruction(program, wallet.publicKey, fragmentMint, amount)
+      await getMintSftInstruction(program, wallet.publicKey, goldFragmentMint, silverFragmentMint, bronzeFragmentMint, amount)
     );
 
     return sendAndConfirmTransaction(connection, wallet, transaction);
@@ -258,18 +262,46 @@ export async function combine(
   try {
     const transaction = new Transaction();
     const connection = program.provider.connection;
-    const [vault] = getVaultPda();
     const fragmentMint = vaultData.fragmentSfts[index].mint;
     const pieceMint = vaultData.pieceSfts[index].mint;
 
     [
       await getCreateAtaInstruction(connection, wallet.publicKey, fragmentMint, wallet.publicKey),
-      await getCreateAtaInstruction(connection, wallet.publicKey, fragmentMint, vault, true),
       await getCreateAtaInstruction(connection, wallet.publicKey, pieceMint, wallet.publicKey),
     ].forEach(ix => ix && transaction.add(ix));
 
     transaction.add(
       await getCombineInstruction(program, wallet.publicKey, fragmentMint, pieceMint, amount)
+    );
+
+    return sendAndConfirmTransaction(connection, wallet, transaction);
+  } catch (error) {
+    console.log(error);
+    return;
+  }
+}
+
+export async function split(
+  wallet: WalletContextState,
+  program: Program<SftVault>,
+  vaultData: Vault,
+  index: number,
+  amount: BN,
+) {
+  if (!wallet.publicKey) return;
+  try {
+    const transaction = new Transaction();
+    const connection = program.provider.connection;
+    const fragmentMint = vaultData.fragmentSfts[index].mint;
+    const pieceMint = vaultData.pieceSfts[index].mint;
+
+    [
+      await getCreateAtaInstruction(connection, wallet.publicKey, fragmentMint, wallet.publicKey),
+      await getCreateAtaInstruction(connection, wallet.publicKey, pieceMint, wallet.publicKey),
+    ].forEach(ix => ix && transaction.add(ix));
+
+    transaction.add(
+      await getSplitInstruction(program, wallet.publicKey, fragmentMint, pieceMint, amount)
     );
 
     return sendAndConfirmTransaction(connection, wallet, transaction);

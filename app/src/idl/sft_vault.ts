@@ -97,12 +97,32 @@ export type SftVault = {
                     "isSigner": false
                 },
                 {
-                    "name": "fragmentMint",
+                    "name": "goldFragmentMint",
                     "isMut": true,
                     "isSigner": false
                 },
                 {
-                    "name": "fragmentAta",
+                    "name": "goldFragmentAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "silverFragmentMint",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "silverFragmentAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "bronzeFragmentMint",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "bronzeFragmentAta",
                     "isMut": true,
                     "isSigner": false
                 },
@@ -165,12 +185,7 @@ export type SftVault = {
                     "isSigner": false
                 },
                 {
-                    "name": "vaultFragmentAta",
-                    "isMut": true,
-                    "isSigner": false
-                },
-                {
-                    "name": "pieceAta",
+                    "name": "payerPieceAta",
                     "isMut": true,
                     "isSigner": false
                 },
@@ -185,6 +200,54 @@ export type SftVault = {
                     "name": "params",
                     "type": {
                         "defined": "CombineParams"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "split",
+            "accounts": [
+                {
+                    "name": "payer",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "vault",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "fragmentMint",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "pieceMint",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "payerFragmentAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "payerPieceAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "params",
+                    "type": {
+                        "defined": "SplitParams"
                     }
                 }
             ]
@@ -367,6 +430,18 @@ export type SftVault = {
         },
         {
             "name": "MintSftParams",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "amount",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "SplitParams",
             "type": {
                 "kind": "struct",
                 "fields": [
@@ -523,12 +598,32 @@ export const IDL: SftVault = {
                     "isSigner": false
                 },
                 {
-                    "name": "fragmentMint",
+                    "name": "goldFragmentMint",
                     "isMut": true,
                     "isSigner": false
                 },
                 {
-                    "name": "fragmentAta",
+                    "name": "goldFragmentAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "silverFragmentMint",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "silverFragmentAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "bronzeFragmentMint",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "bronzeFragmentAta",
                     "isMut": true,
                     "isSigner": false
                 },
@@ -591,12 +686,7 @@ export const IDL: SftVault = {
                     "isSigner": false
                 },
                 {
-                    "name": "vaultFragmentAta",
-                    "isMut": true,
-                    "isSigner": false
-                },
-                {
-                    "name": "pieceAta",
+                    "name": "payerPieceAta",
                     "isMut": true,
                     "isSigner": false
                 },
@@ -611,6 +701,54 @@ export const IDL: SftVault = {
                     "name": "params",
                     "type": {
                         "defined": "CombineParams"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "split",
+            "accounts": [
+                {
+                    "name": "payer",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "vault",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "fragmentMint",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "pieceMint",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "payerFragmentAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "payerPieceAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "params",
+                    "type": {
+                        "defined": "SplitParams"
                     }
                 }
             ]
@@ -793,6 +931,18 @@ export const IDL: SftVault = {
         },
         {
             "name": "MintSftParams",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "amount",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "SplitParams",
             "type": {
                 "kind": "struct",
                 "fields": [
