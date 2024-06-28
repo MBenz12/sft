@@ -3,7 +3,7 @@ export type SftVault = {
     "name": "sft",
     "instructions": [
         {
-            "name": "initialize",
+            "name": "initVault",
             "accounts": [
                 {
                     "name": "authority",
@@ -31,6 +31,59 @@ export type SftVault = {
             ]
         },
         {
+            "name": "createMetadata",
+            "accounts": [
+                {
+                    "name": "authority",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "vault",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "mint",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "metadata",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenMetadataProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "rent",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "params",
+                    "type": {
+                        "defined": "CreateMetadataParams"
+                    }
+                }
+            ]
+        },
+        {
             "name": "mintSft",
             "accounts": [
                 {
@@ -50,6 +103,21 @@ export type SftVault = {
                 },
                 {
                     "name": "fragmentAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "nativeMint",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "payerSolAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "vaultSolAta",
                     "isMut": true,
                     "isSigner": false
                 },
@@ -120,6 +188,70 @@ export type SftVault = {
                     }
                 }
             ]
+        },
+        {
+            "name": "withdraw",
+            "accounts": [
+                {
+                    "name": "authority",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "vault",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "nativeMint",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "authoritySolAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "vaultSolAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "params",
+                    "type": {
+                        "defined": "WithdrawParams"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "closePda",
+            "accounts": [
+                {
+                    "name": "signer",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "pda",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": []
         }
     ],
     "accounts": [
@@ -159,6 +291,10 @@ export type SftVault = {
                         }
                     },
                     {
+                        "name": "pricePerSft",
+                        "type": "u64"
+                    },
+                    {
                         "name": "solBalance",
                         "type": "u64"
                     }
@@ -175,6 +311,26 @@ export type SftVault = {
                     {
                         "name": "amount",
                         "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "CreateMetadataParams",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "name": "symbol",
+                        "type": "string"
+                    },
+                    {
+                        "name": "uri",
+                        "type": "string"
                     }
                 ]
             }
@@ -201,12 +357,28 @@ export type SftVault = {
                                 3
                             ]
                         }
+                    },
+                    {
+                        "name": "pricePerSft",
+                        "type": "u64"
                     }
                 ]
             }
         },
         {
             "name": "MintSftParams",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "amount",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "WithdrawParams",
             "type": {
                 "kind": "struct",
                 "fields": [
@@ -257,7 +429,7 @@ export const IDL: SftVault = {
     "name": "sft",
     "instructions": [
         {
-            "name": "initialize",
+            "name": "initVault",
             "accounts": [
                 {
                     "name": "authority",
@@ -285,6 +457,59 @@ export const IDL: SftVault = {
             ]
         },
         {
+            "name": "createMetadata",
+            "accounts": [
+                {
+                    "name": "authority",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "vault",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "mint",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "metadata",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenMetadataProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "rent",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "params",
+                    "type": {
+                        "defined": "CreateMetadataParams"
+                    }
+                }
+            ]
+        },
+        {
             "name": "mintSft",
             "accounts": [
                 {
@@ -304,6 +529,21 @@ export const IDL: SftVault = {
                 },
                 {
                     "name": "fragmentAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "nativeMint",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "payerSolAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "vaultSolAta",
                     "isMut": true,
                     "isSigner": false
                 },
@@ -374,6 +614,70 @@ export const IDL: SftVault = {
                     }
                 }
             ]
+        },
+        {
+            "name": "withdraw",
+            "accounts": [
+                {
+                    "name": "authority",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "vault",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "nativeMint",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "authoritySolAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "vaultSolAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "params",
+                    "type": {
+                        "defined": "WithdrawParams"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "closePda",
+            "accounts": [
+                {
+                    "name": "signer",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "pda",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": []
         }
     ],
     "accounts": [
@@ -413,6 +717,10 @@ export const IDL: SftVault = {
                         }
                     },
                     {
+                        "name": "pricePerSft",
+                        "type": "u64"
+                    },
+                    {
                         "name": "solBalance",
                         "type": "u64"
                     }
@@ -429,6 +737,26 @@ export const IDL: SftVault = {
                     {
                         "name": "amount",
                         "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "CreateMetadataParams",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "name": "symbol",
+                        "type": "string"
+                    },
+                    {
+                        "name": "uri",
+                        "type": "string"
                     }
                 ]
             }
@@ -455,12 +783,28 @@ export const IDL: SftVault = {
                                 3
                             ]
                         }
+                    },
+                    {
+                        "name": "pricePerSft",
+                        "type": "u64"
                     }
                 ]
             }
         },
         {
             "name": "MintSftParams",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "amount",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "WithdrawParams",
             "type": {
                 "kind": "struct",
                 "fields": [

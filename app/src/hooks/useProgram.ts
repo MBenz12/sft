@@ -1,13 +1,13 @@
 import { AnchorProvider, Program } from '@project-serum/anchor';
 import { useState, useEffect } from 'react';
-import { IDL, SplVault } from 'idl/spl_vault';
-import idl from 'idl/spl_vault.json';
+import { IDL, SftVault } from 'idl/sft_vault';
+import idl from 'idl/sft_vault.json';
 import { useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 
 const useProgram = () => {
     const anchorWallet = useAnchorWallet();
     const { connection } = useConnection();
-    const [program, setProgram] = useState<Program<SplVault>>();
+    const [program, setProgram] = useState<Program<SftVault>>();
 
     useEffect(() => {
         if (!connection || !anchorWallet) return;

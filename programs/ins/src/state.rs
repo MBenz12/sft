@@ -12,6 +12,8 @@ pub struct Vault {
     // 0: gold, 1: silver, 2: bronze
     pub fragment_sfts: [Sft; 3],
 
+    pub price_per_sft: u64,
+
     pub sol_balance: u64,
 }
 

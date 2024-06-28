@@ -3,7 +3,7 @@
     "name": "sft",
     "instructions": [
         {
-            "name": "initialize",
+            "name": "initVault",
             "accounts": [
                 {
                     "name": "authority",
@@ -31,6 +31,59 @@
             ]
         },
         {
+            "name": "createMetadata",
+            "accounts": [
+                {
+                    "name": "authority",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "vault",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "mint",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "metadata",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenMetadataProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "rent",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "params",
+                    "type": {
+                        "defined": "CreateMetadataParams"
+                    }
+                }
+            ]
+        },
+        {
             "name": "mintSft",
             "accounts": [
                 {
@@ -50,6 +103,21 @@
                 },
                 {
                     "name": "fragmentAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "nativeMint",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "payerSolAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "vaultSolAta",
                     "isMut": true,
                     "isSigner": false
                 },
@@ -120,6 +188,70 @@
                     }
                 }
             ]
+        },
+        {
+            "name": "withdraw",
+            "accounts": [
+                {
+                    "name": "authority",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "vault",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "nativeMint",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "authoritySolAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "vaultSolAta",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "params",
+                    "type": {
+                        "defined": "WithdrawParams"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "closePda",
+            "accounts": [
+                {
+                    "name": "signer",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "pda",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": []
         }
     ],
     "accounts": [
@@ -159,6 +291,10 @@
                         }
                     },
                     {
+                        "name": "pricePerSft",
+                        "type": "u64"
+                    },
+                    {
                         "name": "solBalance",
                         "type": "u64"
                     }
@@ -175,6 +311,26 @@
                     {
                         "name": "amount",
                         "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "CreateMetadataParams",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "name": "symbol",
+                        "type": "string"
+                    },
+                    {
+                        "name": "uri",
+                        "type": "string"
                     }
                 ]
             }
@@ -201,12 +357,28 @@
                                 3
                             ]
                         }
+                    },
+                    {
+                        "name": "pricePerSft",
+                        "type": "u64"
                     }
                 ]
             }
         },
         {
             "name": "MintSftParams",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "amount",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "WithdrawParams",
             "type": {
                 "kind": "struct",
                 "fields": [

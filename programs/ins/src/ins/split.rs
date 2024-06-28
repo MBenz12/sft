@@ -1,7 +1,7 @@
 use crate::*;
 
 #[derive(Accounts)]
-pub struct Combine<'info> {
+pub struct Split<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -47,12 +47,12 @@ pub struct Combine<'info> {
 }
 
 #[derive(Clone, AnchorSerialize, AnchorDeserialize)]
-pub struct CombineParams {
+pub struct SplitParams {
     amount: u64,
 }
 
-impl Combine<'_> {
-    pub fn handler(ctx: Context<Self>, params: CombineParams) -> Result<()> {
+impl Split<'_> {
+    pub fn handler(ctx: Context<Self>, params: SplitParams) -> Result<()> {
         let vault = &ctx.accounts.vault;
         let fragment_mint_key = ctx.accounts.fragment_mint.key();
         let piece_mint_key = ctx.accounts.piece_mint.key();
@@ -81,32 +81,32 @@ impl Combine<'_> {
             CpiContext::new_with_signer(
                 ctx.accounts.token_program.to_account_info(),
                 MintTo {
-                    mint: ctx.accounts.piece_mint.to_account_info(),
-                    to: ctx.accounts.payer_piece_ata.to_account_info(),
+                    mint: ctx.accounts.fragment_mint.to_account_info(),
+                    to: ctx.accounts.payer_fragment_ata.to_account_info(),
                     authority: ctx.accounts.vault.to_account_info(),
                 },
                 signer,
             ),
-            amount,
+            amount * 10,
         )?;
 
-        // Burn amount * 10 of fragment_mint from payer_fragment_ata
+        // Burn amount * 10 of piece_mint from payer_piece_ata
         burn(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
                 Burn {
-                    mint: ctx.accounts.fragment_mint.to_account_info(),
-                    from: ctx.accounts.payer_fragment_ata.to_account_info(),
+                    mint: ctx.accounts.piece_mint.to_account_info(),
+                    from: ctx.accounts.payer_piece_ata.to_account_info(),
                     authority: ctx.accounts.payer.to_account_info(),
                 },
             ),
-            amount * 10,
+            amount,
         )?;
 
         let vault = &mut ctx.accounts.vault;
-        // Update the minted_amount in piece_sfts
-        vault.piece_sfts[fragment_index].minted_amount += amount;
-        vault.fragment_sfts[fragment_index].minted_amount -= amount * 10;
+        // Update the minted_amount in piece_sfts & fragment_sfts
+        vault.piece_sfts[fragment_index].minted_amount -= amount;
+        vault.fragment_sfts[fragment_index].minted_amount += amount * 10;
 
         Ok(())
     }

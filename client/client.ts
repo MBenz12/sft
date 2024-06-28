@@ -1,6 +1,15 @@
+import * as web3 from "@solana/web3.js";
+import * as anchor from "@coral-xyz/anchor";
 import * as anchor from "@coral-xyz/anchor";
 import * as web3 from "@solana/web3.js";
 import type { Ins } from "../target/types/ins";
+import type { Ins } from "../target/types/ins";
+
+// Configure the client to use the local cluster
+anchor.setProvider(anchor.AnchorProvider.env());
+
+const program = anchor.workspace.Ins as anchor.Program<Ins>;
+
 
 // Configure the client to use the local cluster
 anchor.setProvider(anchor.AnchorProvider.env());

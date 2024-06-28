@@ -7,10 +7,11 @@ export type Vault = {
   pieceSfts: Sft[],
   fragmentSfts: Sft[],
   solBalance: BN,
+  pricePerSft: BN,
 }
 
 export type Sft = {
   mint: PublicKey,
-  mintAmount: BN,
+  mintedAmount: BN,
   totalSupply: BN,
 };

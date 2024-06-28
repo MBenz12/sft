@@ -25,6 +25,8 @@ pub struct InitVaultParams {
     piece_mints: [Pubkey; 3],
 
     fragment_mints: [Pubkey; 3],
+
+    price_per_sft: u64,
 }
 
 impl InitVault<'_> {
@@ -33,6 +35,7 @@ impl InitVault<'_> {
 
         vault.bump = ctx.bumps.vault.clone();
         vault.authority = ctx.accounts.authority.key();
+        vault.price_per_sft = params.price_per_sft;
 
         const TOTAL_SUPPLIES: [u64; 3] = [200, 500, 1000];
 

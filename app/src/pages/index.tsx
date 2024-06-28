@@ -2,92 +2,46 @@
 import { BN } from '@project-serum/anchor';
 import { useWallet } from '@solana/wallet-adapter-react';
 import useProgram from 'hooks/useProgram';
-import { fund, callCreateUser } from 'libs/methods';
-import { useEffect, useState } from 'react';
+import { mintSft, combine } from 'libs/methods';
+import { useState } from 'react';
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import useFetchVault from 'hooks/useFetchVault';
-import { VAULT_NAME } from 'config';
-import { PublicKey } from '@solana/web3.js';
-import { NATIVE_MINT, getMint } from '@solana/spl-token';
-import { getDecimals } from 'libs/utils';
 
 export default function Home() {
   const wallet = useWallet();
   const program = useProgram();
   const [reload, setReload] = useState({});
-  const [name, setName] = useState(VAULT_NAME);
-  const [admin] = useState(false);
-  const { vault, vaults, user, mints } = useFetchVault(reload, name, admin);
-  const [isSol, setIsSol] = useState(true);
-  const [tokenAddress, setTokenAddress] = useState(NATIVE_MINT.toString());
-  const [decimals, setDecimals] = useState(1e9);
+  const { vault } = useFetchVault(reload);
   const [amount, setAmount] = useState(0);
 
-  const handleCreateUser = async () => {
-    if (!program || !vault || user) return;
+  // console.log(vault?.fragmentSfts.map(sft => sft.mint.toString()));
 
-    await callCreateUser(wallet, program);
-    setReload({});
-  }
-
-  const handleFund = async () => {
+  const handleMintSft = async () => {
     if (!program || !vault) return;
 
-    await fund(wallet, program, VAULT_NAME, new PublicKey(tokenAddress.trim()), new BN(amount * decimals));
+    await mintSft(wallet, program, vault, new BN(amount))
     setReload({});
   }
 
-  useEffect(() => {
-    const getDecimals = async () => {
-      if (!program || !tokenAddress.trim()) return;
-      try {
-        const mint = new PublicKey(tokenAddress.trim());
-        if (mint.toString() === NATIVE_MINT.toString()) {
-          setDecimals(Math.pow(10, 9));
-        } else {
-          const { decimals } = await getMint(program.provider.connection, mint);
-          setDecimals(Math.pow(10, decimals));
-        }
-      } catch (error) {
+  const handleCombine = async (index: number) => {
+    if (!program || !vault) return;
 
-      }
-    };
+    await combine(wallet, program, vault, index, new BN(amount));
+    setReload({});
+  }
 
-    getDecimals();
-  }, [tokenAddress]);
   return (
     <div className='flex flex-col gap-2'>
       <div>
         <WalletMultiButton />
       </div>
-      <div>
-        Vault Name:
-        <select value={name} onChange={(e) => setName(e.target.value)}>
-          {vaults.map(vault => (
-            <option key={vault.name} value={vault.name}>{vault.name}</option>
-          ))}
-        </select>
-      </div>
-      {!user
-        ? <button onClick={handleCreateUser}>Create User</button>
-        : <>
-          Mint Address:
-          <div className='flex gap-2'>
-            <input id='sol' checked={isSol} type="checkbox" onChange={(e) => {
-              e.target.checked && setTokenAddress(NATIVE_MINT.toString());
-              setIsSol(e.target.checked);
-            }} />
-            <label htmlFor='sol'>Sol</label>
-          </div>
-
-          <input value={tokenAddress} onChange={(e) => setTokenAddress(e.target.value)} type="text" className={isSol ? 'hidden' : ''} />
+      {vault && <>
           Amount: <input value={amount} onChange={(e) => setAmount(parseFloat(e.target.value) || 0.0)} type="number" />
-          <button onClick={handleFund}>Fund</button>
-
-          {user.assets.filter(asset => asset.amount.toNumber()).map(asset => (
-            <div className='flex gap-2 items-center' key={asset.mint.toString()}>
-              <div className='w-[500px]'>{asset.mint.toString()}</div>
-              <div className='w-[50px]'>{asset.amount.toNumber() / getDecimals(mints, asset.mint)}</div>
+          <button onClick={handleMintSft}>Mint</button>
+          {vault.fragmentSfts.map((sft, index) => (
+            <div key={index} className='flex gap-2 items-center'>
+              {["Gold", "Silver", "Bronze"][index]}: {sft.mintedAmount.toString()} 
+              <button onClick={() => handleCombine(index)}>Combine</button>
             </div>
           ))}
         </>
