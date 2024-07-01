@@ -101,7 +101,7 @@ export const getWithdrawInstruction = async (
 ) => {
   const [vault] = getVaultPda();
   const authoritySolAta = getAssociatedTokenAddressSync(NATIVE_MINT, authority);
-  const vaultSolAta = getAssociatedTokenAddressSync(NATIVE_MINT, vault, false);
+  const vaultSolAta = getAssociatedTokenAddressSync(NATIVE_MINT, vault, true);
 
   return await program.methods
     .withdraw({ amount })
