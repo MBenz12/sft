@@ -180,8 +180,8 @@ export async function mintSft(
     // const index = Math.floor(Math.random() * 1000) % 3;
 
     const goldFragmentMint: PublicKey = vaultData.fragmentSfts[0].mint;
-    const silverFragmentMint: PublicKey = vaultData.fragmentSfts[0].mint;
-    const bronzeFragmentMint: PublicKey = vaultData.fragmentSfts[0].mint;
+    const silverFragmentMint: PublicKey = vaultData.fragmentSfts[1].mint;
+    const bronzeFragmentMint: PublicKey = vaultData.fragmentSfts[2].mint;
 
     [
       await getCreateAtaInstruction(connection, payer, goldFragmentMint, payer),
