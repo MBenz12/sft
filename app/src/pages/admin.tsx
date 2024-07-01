@@ -37,7 +37,7 @@ export default function Admin() {
   const handleWithdraw = async () => {
     if (!program || !vault) return;
 
-    await withdraw(wallet, program, vault, new BN(amount));
+    await withdraw(wallet, program, vault, new BN(amount * LAMPORTS_PER_SOL));
     setReload({});
   }
 
