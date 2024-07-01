@@ -12,7 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 require("@solana/wallet-adapter-react-ui/styles.css");
 function App() {
-  const [network] = useState(WalletAdapterNetwork.Mainnet);
+  const [network] = useState(WalletAdapterNetwork.Testnet);
   const endpoint = useMemo(() => SOLANA_RPC_URL, []);
 
   const wallets = useMemo(() => [new PhantomWalletAdapter(), new SolflareWalletAdapter({ network }), new TorusWalletAdapter()], [network]);
