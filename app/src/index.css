@@ -2,12 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-button, input {
+body {
+  @apply bg-neutral-900 text-orange-400;
+}
+
+input {
   border: 1px solid black;
   padding: 5px 10px;
   width: fit-content;
 }
 
+input:focus-visible {
+  outline: none;
+}
+
 .wallet-adapter-button-trigger {
   background-color: #512da8;
+}
+
+button:disabled {
+  @apply cursor-not-allowed;
 }
