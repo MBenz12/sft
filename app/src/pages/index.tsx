@@ -73,7 +73,7 @@ export default function Home() {
         <WalletMultiButton />
       </div>
 
-      <div className='grid sm:grid-cols-2 grid-cols-1 gap-4 mt-10'>
+      <div className='grid sm:grid-cols-2 grid-cols-1 gap-4 mt-5'>
         <div className='border border-white/30 rounded-lg p-5 flex flex-col gap-3 items-center justify-center'>
           <p>Gold Piece: 10 Gold Fragment</p>
           <p>Silver Piece: 10 Silver Fragment</p>
