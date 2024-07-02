@@ -15,30 +15,22 @@ export default function Home() {
   const program = useProgram();
   const [reload, setReload] = useState({});
   const { vault, balances } = useFetchVault(reload);
+  const [selectedAction, setSelectedAction] = useState<"combine" | "divide">("combine");
+  const [selectedType, setSelectedType] = useState(0);
   const [values, setValues] = useState<{ [key: string]: any }>({
     mintAmount: 0,
-    combineAmounts: [0, 0, 0],
-    splitAmounts: [0, 0, 0],
+    actionAmount: 0,
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index?: number) => {
     let value = parseInt(e.target.value) || 0;
-    if (["combineAmounts", "splitAmounts"].includes(e.target.name)) {
-      const amounts = [...values[e.target.name]];
-      amounts[index!] = value;
-      setValues({
-        ...values,
-        [e.target.name]: amounts,
-      });
-    } else {
-      setValues({
-        ...values,
-        [e.target.name]: value,
-      });
-    }
+    setValues({
+      ...values,
+      [e.target.name]: value,
+    });
   }
 
-  // console.log(vault?.fragmentSfts.map(sft => sft.mint.toString()));
 
   const handleMintSft = async () => {
     if (!program || !vault) return;
@@ -49,23 +41,21 @@ export default function Home() {
     setReload({});
   }
 
-  const handleCombine = async (index: number) => {
+  const handleAction = async () => {
     if (!program || !vault) return;
 
-    const amount = values.combineAmounts[index];
+    const amount = values.actionAmount;
     if (!amount) return;
 
-    await combine(wallet, program, vault, index, new BN(amount));
-    setReload({});
-  }
+    setLoading(true);
 
-  const handleSplit = async (index: number) => {
-    if (!program || !vault) return;
+    if (selectedAction === "combine") {
+      await combine(wallet, program, vault, selectedType, new BN(amount));
+    } else {
+      await split(wallet, program, vault, selectedType, new BN(amount));
+    }
 
-    const amount = values.splitAmounts[index];
-    if (!amount) return;
-
-    await split(wallet, program, vault, index, new BN(amount));
+    setLoading(false);
     setReload({});
   }
 
@@ -117,73 +107,77 @@ export default function Home() {
         <div className='flex flex-col items-center gap-4'>
           <div className='flex items-center gap-2'>
             <button
-              className="rounded-md bg-gray-800 hover:bg-gray-600 w-8 h-8"
+              className="rounded-md bg-gray-800 hover:bg-gray-600 w-10 h-10"
               disabled={values.mintAmount === 0}
               onClick={() => setValues({ ...values, mintAmount: Math.max(0, values.mintAmount - 10) })}
             >
               {"-"}
             </button>
             <input
-              className='bg-transparent rounded-md border border-white/30'
+              className='bg-transparent rounded-md border border-white/30 py-2'
               name='mintAmount'
               value={values.mintAmount}
               onChange={handleChange}
               min={0}
             />
             <button
-              className="rounded-md bg-gray-800 hover:bg-gray-600 w-8 h-8"
+              className="rounded-md bg-gray-800 hover:bg-gray-600 w-10 h-10"
               onClick={() => setValues({ ...values, mintAmount: values.mintAmount + 10 })}
             >
               {"+"}
             </button>
           </div>
           <button
-            className="rounded-md bg-gray-800 hover:bg-gray-600 w-full py-2"
+            className="rounded-md bg-gray-800 hover:bg-gray-600 w-full p-2"
             onClick={handleMintSft}
           >
             MINT
           </button>
         </div>
       </div>
-      <div className='mt-4 mb-10 border border-white/30 rounded-lg p-5 flex flex-col gap-3 items-center justify-center'>
-          
+      <div className='mt-4 mb-14 border border-white/30 rounded-lg p-5 grid md:grid-cols-4 gap-3 items-center'>
+        <select
+          value={selectedAction}
+          onChange={(e) => {
+            setSelectedAction(e.target.value as "combine" | "divide");
+            setValues({ ...values, actionAmount: 0 });
+          }}
+          className='bg-transparent border border-white/30 rounded-md p-2'
+        >
+          <option value={"combine"}>Combine</option>
+          <option value={"divide"}>Divide</option>
+        </select>
+        <select
+          value={selectedType}
+          onChange={(e) => {
+            setSelectedType(parseInt(e.target.value));
+            setValues({ ...values, actionAmount: 0 });
+          }}
+          className='bg-transparent border border-white/30 rounded-md p-2'
+        >
+          {Array(3).fill(0).map((_, index: number) =>
+            <option value={index} key={index}>
+              {["Gold", "Silver", "Bronze"][index]} {selectedAction === "combine" ? "Fragments" : "Pieces"}
+            </option>
+          )}
+        </select>
+        <input
+          className='bg-transparent rounded-md border border-white/30 w-full p-2'
+          name='actionAmount'
+          type='number'
+          value={values.actionAmount}
+          onChange={handleChange}
+          min={0}
+          max={balances[(selectedAction === "combine" ? 0 : 1) * 3 + selectedType] / (selectedAction === "combine" ? 10 : 1)}
+        />
+        <button
+          className="rounded-md bg-gray-800 hover:bg-gray-600 w-full py-2"
+          onClick={handleAction}
+          disabled={loading}
+        >
+          {selectedAction === "combine" ? "Combine" : "Divide"}
+        </button>
       </div>
     </div>
   );
-
-  // return (
-  //   <div className='flex flex-col gap-2'>
-  //     <div>
-  //       <WalletMultiButton />
-  //     </div>
-  //     {vault && <>
-  //       Amount: <input name="mintAmount" value={values.mintAmount} onChange={handleChange} type="number" min={0} />
-  //       <button onClick={handleMintSft}>Mint</button>
-  //       {vault.fragmentSfts.map((sft, index) => (
-  //         <div key={index} className='flex gap-2 items-center'>
-  //           {["Gold", "Silver", "Bronze"][index]}: {sft.mintedAmount.toString()}/{sft.totalSupply.toNumber()} Fragment(s), {vault.pieceSfts[index].mintedAmount.toString()}/{vault.pieceSfts[index].totalSupply.toString()} Piece(s)
-  //           <input
-  //             name='combineAmounts'
-  //             value={values.combineAmounts[index]}
-  //             onChange={(e) => handleChange(e, index)}
-  //             type="number"
-  //             min={0}
-  //             max={vault.fragmentSfts[index].mintedAmount / 10}
-  //           />
-  //           <button onClick={() => handleCombine(index)}>Combine</button>
-  //           <input
-  //             name='splitAmounts'
-  //             value={values.splitAmounts[index]}
-  //             onChange={(e) => handleChange(e, index)}
-  //             type="number"
-  //             min={0}
-  //             max={vault.pieceSfts[index].mintedAmount}
-  //           />
-  //           <button onClick={() => handleSplit(index)}>Split</button>
-  //         </div>
-  //       ))}
-  //     </>
-  //     }
-  //   </div>
-  // )
 }
