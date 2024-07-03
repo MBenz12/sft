@@ -8,6 +8,8 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import useFetchVault from 'hooks/useFetchVault';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import SftCard from 'components/SftCard';
+import { ReactComponent as LoadingIcon } from "assets/loading.svg";
+import { toast } from 'react-toastify';
 
 export default function Home() {
   const wallet = useWallet();
@@ -37,7 +39,13 @@ export default function Home() {
 
     if (!values.mintAmount) return;
 
-    await mintSft(wallet, program, vault, new BN(values.mintAmount))
+    setLoading(true);
+    if (await mintSft(wallet, program, vault, new BN(values.mintAmount))) {
+      toast.success("Minted successfully!");
+    } else {
+      toast.error("Failed to mint!");
+    }
+    setLoading(false);
     setReload({});
   }
 
@@ -50,9 +58,17 @@ export default function Home() {
     setLoading(true);
 
     if (selectedAction === "combine") {
-      await combine(wallet, program, vault, selectedType, new BN(amount));
+      if (await combine(wallet, program, vault, selectedType, new BN(amount))) {
+        toast.success("Combined successfully!");
+      } else {
+        toast.error("Failed to combine!");
+      }
     } else {
-      await split(wallet, program, vault, selectedType, new BN(amount));
+      if (await split(wallet, program, vault, selectedType, new BN(amount))) {
+        toast.success("Divided successfully!");
+      } else {
+        toast.error("Failed to divide!");
+      }
     }
 
     setLoading(false);
@@ -128,9 +144,10 @@ export default function Home() {
             </button>
           </div>
           <button
-            className="rounded-md bg-gray-800 hover:bg-gray-600 w-full p-2"
+            className={`text-lg font-bold rounded-md bg-gray-800 hover:bg-gray-600 w-full p-2 flex justify-center items-center gap-1 ${loading && "pointer-events-none"}`}
             onClick={handleMintSft}
           >
+            {loading && <LoadingIcon className="animate-spin h-4 w-4 " />}
             MINT
           </button>
         </div>
@@ -171,10 +188,11 @@ export default function Home() {
           max={balances[(selectedAction === "combine" ? 0 : 1) * 3 + selectedType] / (selectedAction === "combine" ? 10 : 1)}
         />
         <button
-          className="rounded-md bg-gray-800 hover:bg-gray-600 w-full py-2"
+          className={`text-lg font-bold rounded-md bg-gray-800 hover:bg-gray-600 w-full py-2 flex items-center justify-center gap-2 ${loading && "pointer-events-none"}`}
           onClick={handleAction}
           disabled={loading}
         >
+          {loading && <LoadingIcon className="animate-spin h-4 w-4 " />}
           {selectedAction === "combine" ? "Combine" : "Divide"}
         </button>
       </div>

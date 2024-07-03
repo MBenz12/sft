@@ -20,10 +20,12 @@ const useFetchVault = (reload: {}) => {
         setVault(vaultData);
         setBalances(await Promise.all([...vaultData.fragmentSfts, ...vaultData.pieceSfts].map(async (sft) => {
           const ata = getAssociatedTokenAddressSync(sft.mint, publicKey);
-          const { value: {
-            uiAmount,
-          } } = await program.provider.connection.getTokenAccountBalance(ata);
-          return uiAmount || 0;
+          try {
+            const { value: { uiAmount } } = await program.provider.connection.getTokenAccountBalance(ata);
+            return uiAmount || 0;
+          } catch (error) {
+            return 0;
+          }
         })))
       } else {
         setVault(undefined);
